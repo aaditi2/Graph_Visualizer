@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Graphoria</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <!-- Full‐screen background video -->
+  <video id="bg-video" autoplay muted loop playsinline>
+    <source src="./backgroundpics/links.avif" type="video/avif">
+    <!-- Optional fallback -->
+    <!-- <source src="background.webm" type="video/webm"> -->
+  </video>
+
+  <!-- Intro screen -->
+  <section id="intro">
+    <h1>Welcome to Graphoria</h1>
+    <p>Your interactive playground for learning graph theory concepts.</p>
+    <button id="startBtn">
+      Let’s Start <span class="arrow">&rarr;</span>
+    </button>
+  </section>
+
+  <!-- Main menu -->
+  <section id="menu">
+    <button id="backBtn" class="back-btn">&larr; Back</button>
+    <h2>Choose a module:</h2>
+    <div class="cards">
+      <div class="card" data-link="debruijn.html">De Bruijn Graphs</div>
+      <div class="card" data-link="random.html">Random Models</div>
+      <div class="card" data-link="metrics.html">Node Metrics</div>
+      <div class="card" data-link="global.html">Global Properties</div>
+    </div>
+  </section>
+
+  <script src="script.js"></script>
+</body>
+</html>

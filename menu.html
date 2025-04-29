@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Graphoria – Modules</title>
+  <link rel="stylesheet" href="styles.css">
+  <!-- Override background & text for this page -->
+  <style>
+    body {
+      /* Use a solid color matching your theme */
+      background: var(--primary);
+      color: #fff;
+      overflow: auto;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      position: relative;
+    }
+    /* Cards on a dark bg should be light */
+    .card {
+      background: #fff;
+      color: var(--primary);
+      border: 2px solid #fff;
+    }
+    .card:hover {
+      background: var(--accent);
+      color: #fff;
+      border-color: var(--accent);
+    }
+    /* Back button: invert to stand out */
+    .back-btn {
+      background: #fff;
+      color: var(--primary);
+    }
+    .back-btn:hover {
+      background: var(--accent);
+      color: #fff;
+    }
+  </style>
+</head>
+<body>
+  <section id="menu">
+    <button id="backBtn" class="back-btn">&larr; Back</button>
+    <h2>Choose a module:</h2>
+    <div class="cards">
+      <div class="card" data-link="debruijn.html">De Bruijn Graphs</div>
+      <div class="card" data-link="random.html">Random Models</div>
+      <div class="card" data-link="metrics.html">Node Metrics</div>
+      <div class="card" data-link="global.html">Global Properties</div>
+    </div>
+  </section>
+
+  <script>
+    // Back to welcome
+    document.getElementById("backBtn").addEventListener("click", () => {
+      window.location.href = "index.html";
+    });
+    // Navigate into modules
+    document.querySelectorAll(".card").forEach(c => {
+      c.addEventListener("click", () => {
+        window.location.href = c.dataset.link;
+      });
+    });
+  </script>
+</body>
+</html>
