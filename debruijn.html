@@ -136,6 +136,210 @@
           .attr("transform", d => `translate(${d.x},${d.y})`);
       });
     });
+
+    // debruijn.js
+window.addEventListener("DOMContentLoaded", () => {
+  // Home button back to menu
+  document.getElementById("homeBtn")
+    .addEventListener("click", () => window.location.href = "menu.html");
+
+  // Create a tooltip container
+  const tooltip = d3.select("body")
+    .append("div")
+    .attr("class", "tooltip");
+
+  // Grab SVG
+  const svg = d3.select("#debruijn-svg");
+  const width = +svg.attr("width");
+  const height = +svg.attr("height");
+
+  document.getElementById("buildBtn").addEventListener("click", () => {
+    const seq = document.getElementById("seqInput").value.trim();
+    const k   = +document.getElementById("kInput").value;
+    if (k < 1 || k > seq.length) {
+      return alert("Choose k between 1 and sequence length");
+    }
+
+    // 1) extract k-mers
+    const kmers = [];
+    for (let i = 0; i <= seq.length - k; i++) {
+      kmers.push(seq.substr(i, k));
+    }
+
+    // 2) unique nodes and 3) directed edges
+    const nodes = Array.from(new Set(kmers)).map(id => ({ id }));
+    const links = kmers.slice(0, -1).map((src, i) => ({
+      source: src,
+      target: kmers[i + 1]
+    }));
+
+    // Build adjacency for undirected metrics
+    const adj = {};
+    nodes.forEach(n => adj[n.id] = []);
+    links.forEach(l => {
+      adj[l.source].push(l.target);
+      adj[l.target].push(l.source);
+    });
+
+    // Degree centrality
+    const deg = {};
+    for (const id in adj) deg[id] = adj[id].length;
+
+    // Closeness centrality
+    const closeness = {};
+    nodes.forEach(n => {
+      const dist = {};
+      nodes.forEach(m => dist[m.id] = Infinity);
+      dist[n.id] = 0;
+      const queue = [n.id];
+      for (let qi = 0; qi < queue.length; qi++) {
+        const v = queue[qi];
+        adj[v].forEach(w => {
+          if (dist[w] === Infinity) {
+            dist[w] = dist[v] + 1;
+            queue.push(w);
+          }
+        });
+      }
+      const sum = nodes.reduce((s,m) => s + dist[m.id], 0);
+      closeness[n.id] = sum > 0 ? (nodes.length - 1) / sum : 0;
+    });
+
+    // Betweenness centrality (Brandes)
+    const betweenness = {};
+    nodes.forEach(n => betweenness[n.id] = 0);
+    nodes.forEach(s => {
+      const S = [];
+      const P = {};
+      const sigma = {};
+      const dist = {};
+      nodes.forEach(w => {
+        P[w.id] = [];
+        sigma[w.id] = 0;
+        dist[w.id] = -1;
+      });
+      sigma[s.id] = 1;
+      dist[s.id] = 0;
+      const Q = [s.id];
+      for (let qi=0; qi<Q.length; qi++) {
+        const v = Q[qi];
+        S.push(v);
+        adj[v].forEach(w => {
+          if (dist[w] < 0) {
+            dist[w] = dist[v] + 1;
+            Q.push(w);
+          }
+          if (dist[w] === dist[v] + 1) {
+            sigma[w] += sigma[v];
+            P[w].push(v);
+          }
+        });
+      }
+      const delta = {};
+      nodes.forEach(w => delta[w.id] = 0);
+      while (S.length) {
+        const w = S.pop();
+        P[w].forEach(v => {
+          delta[v] += (sigma[v] / sigma[w]) * (1 + delta[w]);
+        });
+        if (w !== s.id) betweenness[w] += delta[w];
+      }
+    });
+
+    // Clear old drawing
+    svg.selectAll("*").remove();
+
+    // Arrowhead marker
+    svg.append("defs")
+      .append("marker")
+        .attr("id", "arrow")
+        .attr("viewBox", "0 -5 10 10")
+        .attr("refX", 20)
+        .attr("refY", 0)
+        .attr("markerWidth", 6)
+        .attr("markerHeight", 6)
+        .attr("orient", "auto")
+      .append("path")
+        .attr("d", "M0,-5L10,0L0,5")
+        .attr("fill", "#999");
+
+    // Force simulation
+    const sim = d3.forceSimulation(nodes)
+      .force("link", d3.forceLink(links).id(d => d.id).distance(80))
+      .force("charge", d3.forceManyBody().strength(-200))
+      .force("center", d3.forceCenter(width/2, height/2));
+
+    // Draw links
+    const linkSel = svg.append("g")
+      .selectAll("line")
+      .data(links)
+      .join("line")
+        .attr("stroke", "#999")
+        .attr("stroke-width", 2)
+        .attr("marker-end", "url(#arrow)");
+
+    // Draw nodes as groups
+    const nodeGroup = svg.append("g")
+      .selectAll("g")
+      .data(nodes)
+      .join("g")
+        .call(d3.drag()
+          .on("start", (e,d) => {
+            if (!e.active) sim.alphaTarget(0.3).restart();
+            d.fx = d.x; d.fy = d.y;
+          })
+          .on("drag", (e,d) => {
+            d.fx = e.x; d.fy = e.y;
+          })
+          .on("end", (e,d) => {
+            if (!e.active) sim.alphaTarget(0);
+            d.fx = d.fy = null;
+          })
+        );
+
+    nodeGroup.append("circle")
+      .attr("r", 15)
+      .attr("fill", "#ef233c");
+
+    nodeGroup.append("text")
+      .text(d => d.id)
+      .attr("x", 0).attr("y", 5)
+      .attr("text-anchor", "middle")
+      .attr("fill", "white")
+      .style("font-size", "10px");
+
+    // Tooltip behavior
+    nodeGroup
+      .on("mouseover", (event,d) => {
+        tooltip
+          .style("opacity", 1)
+          .html(`
+            k-mer: <strong>${d.id}</strong><br/>
+            Degree: ${deg[d.id]}<br/>
+            Closeness: ${closeness[d.id].toFixed(2)}<br/>
+            Betweenness: ${betweenness[d.id].toFixed(2)}
+          `)
+          .style("left", `${event.pageX+5}px`)
+          .style("top",  `${event.pageY+5}px`);
+      })
+      .on("mouseout", () => {
+        tooltip.style("opacity", 0);
+      });
+
+    // Tick update
+    sim.on("tick", () => {
+      linkSel
+        .attr("x1", d => d.source.x)
+        .attr("y1", d => d.source.y)
+        .attr("x2", d => d.target.x)
+        .attr("y2", d => d.target.y);
+
+      nodeGroup
+        .attr("transform", d => `translate(${d.x},${d.y})`);
+    });
+  });
+});
+
   </script>
 </body>
 </html>
