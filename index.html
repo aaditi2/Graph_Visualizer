@@ -8,9 +8,7 @@
 <body>
   <!-- Full‐screen background video -->
   <video id="bg-video" autoplay muted loop playsinline>
-    <source src="./backgroundpics/links.avif" type="video/avif">
-    <!-- Optional fallback -->
-    <!-- <source src="background.webm" type="video/webm"> -->
+    <source src="./backgroundpics/creme.mp4" type="video/mp4">
   </video>
 
   <!-- Intro screen -->
@@ -22,18 +20,13 @@
     </button>
   </section>
 
-  <!-- Main menu -->
-  <section id="menu">
-    <button id="backBtn" class="back-btn">&larr; Back</button>
-    <h2>Choose a module:</h2>
-    <div class="cards">
-      <div class="card" data-link="debruijn.html">De Bruijn Graphs</div>
-      <div class="card" data-link="random.html">Random Models</div>
-      <div class="card" data-link="metrics.html">Node Metrics</div>
-      <div class="card" data-link="global.html">Global Properties</div>
-    </div>
-  </section>
 
-  <script src="script.js"></script>
+  <script>
+    // index.js
+document.getElementById("startBtn").addEventListener("click", () => {
+  window.location.href = "menu.html";
+});
+
+  </script>
 </body>
 </html>

@@ -6,40 +6,18 @@
   <link rel="stylesheet" href="styles.css">
   <!-- Override background & text for this page -->
   <style>
-    body {
-      /* Use a solid color matching your theme */
-      background: var(--primary);
-      color: #fff;
-      overflow: auto;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      min-height: 100vh;
-      position: relative;
-    }
-    /* Cards on a dark bg should be light */
-    .card {
-      background: #fff;
-      color: var(--primary);
-      border: 2px solid #fff;
-    }
-    .card:hover {
-      background: var(--accent);
-      color: #fff;
-      border-color: var(--accent);
-    }
-    /* Back button: invert to stand out */
-    .back-btn {
-      background: #fff;
-      color: var(--primary);
-    }
-    .back-btn:hover {
-      background: var(--accent);
-      color: #fff;
-    }
+      #menu {
+        display: block !important;
+        width: 90%;
+        max-width: 800px;
+        text-align: center;
+      }
   </style>
 </head>
 <body>
+  <video id="bg-video" autoplay muted loop playsinline>
+    <source src="./backgroundpics/creme.mp4" type="video/mp4">
+  </video>
   <section id="menu">
     <button id="backBtn" class="back-btn">&larr; Back</button>
     <h2>Choose a module:</h2>

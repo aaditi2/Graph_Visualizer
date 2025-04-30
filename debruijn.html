@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Graphoria – De Bruijn Graphs</title>
+  <link rel="stylesheet" href="debruijn.css">
+  <!-- D3.js for visualization -->
+  <script src="https://d3js.org/d3.v7.min.js"></script>
+</head>
+<body>
+
+  <h3>De Bruijn Graphs</h3>
+
+
+  <!-- Main module content -->
+  <section class="module-content">
+    <div class="debruijn-controls">
+      <label>
+        Sequence:
+        <input type="text" id="seqInput" value="ATGCGATGACCTG" />
+      </label>
+      <label>
+        k-mer length:
+        <input type="number" id="kInput" min="1" value="3" />
+      </label>
+      <button id="buildBtn">Build Graph</button>
+    </div>
+    <svg id="debruijn-svg" width="400" height="500"></svg>
+  </section>
+  <button id="homeBtn">&larr; Home</button>
+
+  <script>
+    // Home button logic
+    document.getElementById("homeBtn")
+      .addEventListener("click", () => window.location.href = "menu.html");
+
+    // D3-driven De Bruijn builder
+    const buildBtn = document.getElementById("buildBtn");
+    const svg      = d3.select("#debruijn-svg");
+    const width    = +svg.attr("width");
+    const height   = +svg.attr("height");
+
+    buildBtn.addEventListener("click", () => {
+      const seq = document.getElementById("seqInput").value.trim();
+      const k   = +document.getElementById("kInput").value;
+      if (k < 1 || k > seq.length) {
+        return alert("Choose k between 1 and sequence length");
+      }
+
+      // 1) extract k-mers
+      const kmers = [];
+      for (let i = 0; i <= seq.length - k; i++) {
+        kmers.push(seq.substr(i, k));
+      }
+
+      // 2) unique nodes
+      const nodes = Array.from(new Set(kmers)).map(id => ({ id }));
+
+      // 3) edges between adjacent k-mers
+      const links = kmers.slice(0, -1).map((src, i) => ({
+        source: src,
+        target: kmers[i + 1]
+      }));
+
+      // clear previous
+      svg.selectAll("*").remove();
+
+      // arrow marker
+      svg.append("defs")
+        .append("marker")
+          .attr("id", "arrow")
+          .attr("viewBox", "0 -5 10 10")
+          .attr("refX", 20)
+          .attr("refY", 0)
+          .attr("markerWidth", 6)
+          .attr("markerHeight", 6)
+          .attr("orient", "auto")
+        .append("path")
+          .attr("d", "M0,-5L10,0L0,5")
+          .attr("fill", "#999");
+
+      // force simulation
+      const sim = d3.forceSimulation(nodes)
+        .force("link", d3.forceLink(links).id(d => d.id).distance(80))
+        .force("charge", d3.forceManyBody().strength(-200))
+        .force("center", d3.forceCenter(width/2, height/2));
+
+      // draw links
+      const linkSel = svg.append("g")
+        .selectAll("line")
+        .data(links)
+        .join("line")
+          .attr("stroke", "#999")
+          .attr("stroke-width", 2)
+          .attr("marker-end", "url(#arrow)");
+
+      // draw nodes
+      const nodeSel = svg.append("g")
+        .selectAll("g")
+        .data(nodes)
+        .join("g")
+        .call(d3.drag()
+          .on("start", (e, d) => {
+            if (!e.active) sim.alphaTarget(0.3).restart();
+            d.fx = d.x; d.fy = d.y;
+          })
+          .on("drag", (e, d) => {
+            d.fx = e.x; d.fy = e.y;
+          })
+          .on("end", (e, d) => {
+            if (!e.active) sim.alphaTarget(0);
+            d.fx = d.fy = null;
+          })
+        );
+
+      nodeSel.append("circle")
+        .attr("r", 15)
+        .attr("fill", "#ef233c");
+
+      nodeSel.append("text")
+        .text(d => d.id)
+        .attr("x", 0).attr("y", 5)
+        .attr("text-anchor", "middle")
+        .attr("fill", "white")
+        .style("font-size", "12px");
+
+      // tick updates
+      sim.on("tick", () => {
+        linkSel
+          .attr("x1", d => d.source.x)
+          .attr("y1", d => d.source.y)
+          .attr("x2", d => d.target.x)
+          .attr("y2", d => d.target.y);
+
+        nodeSel
+          .attr("transform", d => `translate(${d.x},${d.y})`);
+      });
+    });
+  </script>
+</body>
+</html>

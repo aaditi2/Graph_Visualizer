@@ -1,8 +1,4 @@
-// On “Start” click: hide intro, show menu
-document.getElementById("startBtn").addEventListener("click", () => {
-    document.getElementById("intro").style.display = "none";
-    document.getElementById("menu").style.display  = "block";
-  });
+
   
   // Card clicks: navigate to the module page
   document.querySelectorAll(".card").forEach(card => {

@@ -1,0 +1,102 @@
+:root {
+    --primary: #0d3b66;   /* deep navy */
+    --accent:  #da7b1d;   /* rich crimson */
+    --bg:     white;  /* charcoal */
+    --dark:   white;   /* nearly black */
+    --text:    black;   /* soft white */
+  }
+  
+  
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  
+  #intro p {
+    margin-bottom: 1.5rem;
+    color: var(--dark);
+  }
+
+  body {
+    font-family: sans-serif;
+    color: var(--text);
+    background: var(--bg);
+    /* min-height: 100vh; */
+    align-items: center;
+    justify-content: center;
+    overflow: auto;           /* allow scrollbars when content overflows */
+    min-height: 100vh;        /* ensure body is at least full-screen */
+    padding-bottom: 2rem; 
+  }
+
+
+h3 {
+    color: var(--primary);
+    font-size: 2rem;
+    margin-bottom: 1.5rem;
+    text-shadow: 2px 2px 6px rgba(229 224 224 / 79%);
+    text-align: center;
+    margin-top: 4rem;
+  }
+  
+  .debruijn-controls {
+    margin-bottom: 1rem;
+    display: flex;
+    gap: 1rem;
+    justify-content: center;
+    flex-wrap: wrap;
+  }
+  .debruijn-controls input {
+    width: 150px;
+    padding: 0.25rem;
+    border: 1px solid var(--primary);
+    border-radius: 0.25rem;
+  }
+  .debruijn-controls button {
+    background: var(--primary);
+    color: white;
+    border: none;
+    padding: 0.5rem 1rem;
+    border-radius: 0.3rem;
+    cursor: pointer;
+  }
+  .debruijn-controls button:hover {
+    background: var(--accent);
+  }
+
+  
+
+  /* Wrap controls + SVG in a flex column, centered */
+.module-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;    /* center horizontally */
+    gap: 1rem;              /* space between controls and svg */
+    padding: 1rem;
+  }
+  
+  /* Make the SVG block‐level and center it */
+  #debruijn-svg {
+    display: block;
+    margin: 0 auto;         /* horiz center */
+    max-width: 100%;        /* don’t overflow container */
+    min-height: 500px;      
+    overflow:visible;
+  }
+  
+  #homeBtn {
+    position: fixed;
+    bottom: 1rem;
+    right: 1rem;
+    z-index: 100;             /* sit above SVG/content */
+    background: var(--accent);
+    color: white;
+    border: none;
+    padding: 0.5rem 1rem;
+    border-radius: 0.3rem;
+    font-size: 0.9rem;
+    cursor: pointer;
+    transition: background 0.2s ease;
+  }
+  
+  #homeBtn:hover {
+    background: var(--primary);
+  }
+  

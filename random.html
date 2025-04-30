@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Graphoria – Random Models</title>
+  <link rel="stylesheet" href="random.css">
+  <!-- D3.js -->
+  <script src="https://d3js.org/d3.v7.min.js"></script>
+</head>
+<body>
+
+  <!-- Header -->
+  <header class="module-header">
+    <button id="homeBtn">&larr; Home</button>
+    <h3>Random Models</h3>
+  </header>
+
+  <!-- Controls + Canvas -->
+  <section class="module-content">
+    <div class="random-controls">
+      <label>
+        Model:
+        <select id="modelSelect">
+          <option value="erdos">Erdős–Rényi (G(n,p))</option>
+          <option value="watts">Watts–Strogatz</option>
+          <option value="barabasi">Barabási–Albert</option>
+        </select>
+      </label>
+      <div id="params">
+        <!-- Will be filled by JS -->
+      </div>
+      <button id="generateBtn">Generate Graph</button>
+    </div>
+    <svg id="random-svg" width="800" height="600"></svg>
+  </section>
+
+  <script src="random.js"></script>
+</body>
+</html>
